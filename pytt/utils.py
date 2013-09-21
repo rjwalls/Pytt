@@ -37,7 +37,7 @@ MISSING_PORT = 103
 INVALID_INFO_HASH = 150
 INVALID_PEER_ID = 151
 INVALID_NUMWANT = 152
-GENERIC_ERROR = 900 
+GENERIC_ERROR = 900
 
 # Pytt response messages
 PYTT_RESPONSE_MESSAGES = {
@@ -111,6 +111,14 @@ class BaseHandler(tornado.web.RequestHandler):
         if value != default:
             return str(value)
         return value
+
+    def decode_argument(self, value, name=None):
+        try:
+            return super(BaseHandler, self).decode_argument(value, name)
+        except UnicodeDecodeError:
+            # If the infohash can't be decoded as utf8, then Tornado will
+            # raise a UnicodeDecodeError.
+            return str(value)
 
 
 class ConfigError(Exception):
@@ -228,6 +236,10 @@ def get_peer_list(info_hash, numwant, compact, no_peer_id):
     """Get all the peer's info with peer_id, ip and port.
     Eg: [{'peer_id':'#1223&&IJM', 'ip':'162.166.112.2', 'port': '7887'}, ...]
     """
+
+    # Instead of throwing an error, just return the max number of peers
+    numwant = max(numwant, MAX_ALLOWED_PEERS)
+
     db = get_db()
     if compact:
         byteswant = numwant * 6
@@ -250,4 +262,4 @@ def get_peer_list(info_hash, numwant, compact, no_peer_id):
                 peers.append(p)
         logging.debug('peer list: %r' %peers[:numwant])
         return peers[:numwant]
-    
+
