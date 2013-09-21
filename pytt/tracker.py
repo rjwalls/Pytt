@@ -137,10 +137,16 @@ def start_tracker():
                     default=False, help='Start in background')
     parser.add_option('-d', '--debug', action='store_true',
                     default=False, help='Debug mode')
+    parser.add_option('--start_clean', help='Start with an empty config/db',
+                      action='store_true')
     (options, args) = parser.parse_args()
+
+    if options.start_clean:
+       remove_pytt_dirs()
 
     # setup directories
     create_pytt_dirs()
+
     # setup logging
     setup_logging(options.debug)
 

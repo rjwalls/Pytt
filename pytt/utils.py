@@ -12,6 +12,7 @@ import logging
 import logging.handlers
 import shelve
 from socket import inet_aton
+import shutil
 from struct import pack
 import ConfigParser
 import tornado.web
@@ -87,6 +88,13 @@ def create_config(path):
     with open(path, 'wb') as f:
         config.write(f)
 
+def remove_pytt_dirs():
+    """Remove directories for a fresh start
+    """
+    for path in [CONFIG_PATH, DB_PATH, LOG_PATH]:
+        dirname = os.path.dirname(path)
+        if os.path.exists(dirname):
+            shutil.rmtree(dirname)
 
 def create_pytt_dirs():
     """Create directories to store config, log and db files.
