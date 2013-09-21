@@ -57,9 +57,6 @@ class AnnounceHandler(BaseHandler):
         no_peer_id = int(self.get_argument('no_peer_id', 0))
         event = self.get_argument('event', '')
         numwant = int(self.get_argument('numwant', DEFAULT_ALLOWED_PEERS))
-        if numwant > MAX_ALLOWED_PEERS:
-            # cannot request more than MAX_ALLOWED_PEERS.
-            self.send_error(INVALID_NUMWANT)
 
         # FIXME: What to do with these parameters?
         key = self.get_argument('key', '')
@@ -71,17 +68,17 @@ class AnnounceHandler(BaseHandler):
 
         # generate response
         response = {}
-        # Interval in seconds that the client should wait between sending 
+        # Interval in seconds that the client should wait between sending
         #    regular requests to the tracker.
         response['interval'] = get_config().getint('tracker', 'interval')
-        # Minimum announce interval. If present clients must not re-announce 
+        # Minimum announce interval. If present clients must not re-announce
         #    more frequently than this.
         response['min interval'] = get_config().getint('tracker', 'min_interval')
         # FIXME
         response['tracker id'] = tracker_id
         response['complete'] = no_of_seeders(info_hash)
         response['incomplete'] = no_of_leechers(info_hash)
-        
+
         # get the peer list for this announce
         response['peers'] = get_peer_list(info_hash, numwant, compact, no_peer_id)
 
@@ -136,9 +133,9 @@ def start_tracker():
     # parse commandline options
     parser = OptionParser()
     parser.add_option('-p', '--port', help='Tracker Port', default=0)
-    parser.add_option('-b', '--background', action='store_true', 
+    parser.add_option('-b', '--background', action='store_true',
                     default=False, help='Start in background')
-    parser.add_option('-d', '--debug', action='store_true', 
+    parser.add_option('-d', '--debug', action='store_true',
                     default=False, help='Debug mode')
     (options, args) = parser.parse_args()
 
